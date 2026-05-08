@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KiddoLingo - Belajar Bahasa Inggris</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chalkboard+SE:wght@400;700&family=Bubblegum+Sans&display=swap');
+        
+        body {
+            font-family: 'Bubblegum Sans', cursive;
+            background: #fdf2f8;
+            overflow-x: hidden;
+        }
+
+        .card-bounce:hover {
+            transform: scale(1.05);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .category-btn {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .category-btn:active {
+            transform: scale(0.9);
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        #splash-screen {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-blue-50 min-h-screen flex flex-col">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center text-white p-6 text-center">
+        <h1 class="text-6xl mb-4 animate__animated animate__bounceIn">KiddoLingo! 🌟</h1>
+        <p class="text-xl mb-8 opacity-90">Ayo Belajar Bahasa Inggris Sambil Bermain!</p>
+        <button onclick="startGame()" class="bg-yellow-400 hover:bg-yellow-300 text-purple-900 font-bold py-4 px-10 rounded-full text-2xl shadow-xl transition-all animate__animated animate__pulse animate__infinite">
+            MULAI SEKARANG
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="hidden flex-1 container mx-auto px-4 py-6">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <button onclick="goHome()" class="bg-white p-3 rounded-2xl shadow-md text-3xl">🏠</button>
+            <div class="bg-white px-6 py-2 rounded-full shadow-md">
+                <span id="category-title" class="text-2xl text-purple-600">Pilih Tema</span>
+            </div>
+            <div class="text-3xl">⭐ <span id="score">0</span></div>
+        </header>
+
+        <!-- Category Selection -->
+        <div id="menu-screen" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeIn">
+            <button onclick="loadCategory('greetings')" class="category-btn bg-yellow-300 p-6 rounded-3xl shadow-xl border-b-8 border-yellow-500 text-center">
+                <div class="text-6xl mb-4">👋</div>
+                <h3 class="text-2xl font-bold text-yellow-900">Greetings</h3>
+                <p class="text-yellow-800">Salam & Sapaan</p>
+            </button>
+
+            <button onclick="loadCategory('intro')" class="category-btn bg-green-300 p-6 rounded-3xl shadow-xl border-b-8 border-green-500 text-center">
+                <div class="text-6xl mb-4">🤝</div>
+                <h3 class="text-2xl font-bold text-green-900">Introduction</h3>
+                <p class="text-green-800">Perkenalan Diri</p>
+            </button>
+
+            <button onclick="loadCategory('daily')" class="category-btn bg-blue-300 p-6 rounded-3xl shadow-xl border-b-8 border-blue-500 text-center">
+                <div class="text-6xl mb-4">🏠</div>
+                <h3 class="text-2xl font-bold text-blue-900">Daily Phrases</h3>
+                <p class="text-blue-800">Kalimat Sehari-hari</p>
+            </button>
+
+            <button onclick="loadCategory('animals')" class="category-btn bg-orange-300 p-6 rounded-3xl shadow-xl border-b-8 border-orange-500 text-center">
+                <div class="text-6xl mb-4">🦁</div>
+                <h3 class="text-2xl font-bold text-orange-900">Animals</h3>
+                <p class="text-orange-800">Hewan Lucu</p>
+            </button>
+
+            <button onclick="loadCategory('colors')" class="category-btn bg-pink-300 p-6 rounded-3xl shadow-xl border-b-8 border-pink-500 text-center">
+                <div class="text-6xl mb-4">🎨</div>
+                <h3 class="text-2xl font-bold text-pink-900">Colors</h3>
+                <p class="text-pink-800">Warna-warni</p>
+            </button>
+
+            <button onclick="loadCategory('food')" class="category-btn bg-red-300 p-6 rounded-3xl shadow-xl border-b-8 border-red-500 text-center">
+                <div class="text-6xl mb-4">🍎</div>
+                <h3 class="text-2xl font-bold text-red-900">Food & Fruits</h3>
+                <p class="text-red-800">Makanan & Buah</p>
+            </button>
+        </div>
+
+        <!-- Vocabulary Screen -->
+        <div id="vocab-screen" class="hidden animate__animated animate__fadeIn">
+            <div id="vocab-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Data will be injected here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- UI Audio Logic -->
+    <script>
+        const apiKey = ""; // Runtime provides key
+        let currentScore = 0;
+        let isPlaying = false;
+
+        const data = {
+            greetings: [
+                { en: "Hello!", id: "Halo!", icon: "👋", voice: "Say cheerfully: Hello!" },
+                { en: "Good Morning", id: "Selamat Pagi", icon: "☀️", voice: "Say warmly: Good Morning" },
+                { en: "Good Night", id: "Selamat Malam", icon: "🌙", voice: "Say in a whisper: Good Night" },
+                { en: "Goodbye", id: "Sampai Jumpa", icon: "👋", voice: "Say: Goodbye" },
+                { en: "How are you?", id: "Apa kabarmu?", icon: "😊", voice: "Say friendly: How are you?" }
+            ],
+            intro: [
+                { en: "My name is...", id: "Nama saya adalah...", icon: "📛", voice: "Say: My name is" },
+                { en: "Nice to meet you", id: "Senang bertemu kamu", icon: "🤝", voice: "Say happily: Nice to meet you" },
+                { en: "I am a boy", id: "Saya anak laki-laki", icon: "👦", voice: "Say: I am a boy" },
+                { en: "I am a girl", id: "Saya anak perempuan", icon: "👧", voice: "Say: I am a girl" },
+                { en: "I am five years old", id: "Umur saya 5 tahun", icon: "✋", voice: "Say: I am five years old" }
+            ],
+            daily: [
+                { en: "Thank you", id: "Terima kasih", icon: "🙏", voice: "Say sweetly: Thank you" },
+                { en: "You're welcome", id: "Sama-sama", icon: "✨", voice: "Say: You're welcome" },
+                { en: "Please help me", id: "Tolong bantu saya", icon: "🆘", voice: "Say politely: Please help me" },
+                { en: "I am hungry", id: "Saya lapar", icon: "😋", voice: "Say: I am hungry" },
+                { en: "May I go to the toilet?", id: "Boleh ke toilet?", icon: "🚽", voice: "Say: May I go to the toilet?" }
+            ],
+            animals: [
+                { en: "Cat", id: "Kucing", icon: "🐱", voice: "Say: Cat. Meow!" },
+                { en: "Dog", id: "Anjing", icon: "🐶", voice: "Say: Dog. Woof woof!" },
+                { en: "Lion", id: "Singa", icon: "🦁", voice: "Say: Lion. Rawr!" },
+                { en: "Elephant", id: "Gajah", icon: "🐘", voice: "Say: Elephant" },
+                { en: "Bird", id: "Burung", icon: "🐦", voice: "Say: Bird. Tweet tweet!" }
+            ],
+            colors: [
+                { en: "Red", id: "Merah", icon: "🔴", voice: "Say: Red" },
+                { en: "Blue", id: "Biru", icon: "🔵", voice: "Say: Blue" },
+                { en: "Yellow", id: "Kuning", icon: "🟡", voice: "Say: Yellow" },
+                { en: "Green", id: "Hijau", icon: "🟢", voice: "Say: Green" },
+                { en: "Rainbow", id: "Pelangi", icon: "🌈", voice: "Say happily: Rainbow" }
+            ],
+            food: [
+                { en: "Apple", id: "Apel", icon: "🍎", voice: "Say: Apple" },
+                { en: "Banana", id: "Pisang", icon: "🍌", voice: "Say: Banana" },
+                { en: "Milk", id: "Susu", icon: "🥛", voice: "Say: Milk" },
+                { en: "Bread", id: "Roti", icon: "🍞", voice: "Say: Bread" },
+                { en: "Water", id: "Air", icon: "💧", voice: "Say: Water" }
+            ]
+        };
+
+        function startGame() {
+            document.getElementById('splash-screen').classList.add('animate__fadeOut');
+            setTimeout(() => {
+                document.getElementById('splash-screen').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+            }, 500);
+        }
+
+        function goHome() {
+            document.getElementById('menu-screen').classList.remove('hidden');
+            document.getElementById('vocab-screen').classList.add('hidden');
+            document.getElementById('category-title').innerText = "Pilih Tema";
+        }
+
+        function loadCategory(catKey) {
+            const items = data[catKey];
+            const grid = document.getElementById('vocab-grid');
+            grid.innerHTML = '';
+            
+            document.getElementById('category-title').innerText = catKey.charAt(0).toUpperCase() + catKey.slice(1);
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('vocab-screen').classList.remove('hidden');
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "card-bounce bg-white p-8 rounded-3xl shadow-lg text-center cursor-pointer relative overflow-hidden border-4 border-transparent hover:border-purple-300";
+                card.onclick = () => playVocab(item, card);
+                
+                card.innerHTML = `
+                    <div class="text-7xl mb-4 floating">${item.icon}</div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-1">${item.en}</h2>
+                    <p class="text-xl text-purple-500 font-medium">${item.id}</p>
+                    <div class="audio-status mt-4 text-purple-300">
+                        <svg class="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 14.828a1 1 0 01-1.414-1.414 5 5 0 000-7.072 1 1 0 011.414-1.414 7 7 0 010 9.9z"></path></svg>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function playVocab(item, element) {
+            if (isPlaying) return;
+            isPlaying = true;
+
+            // Visual feedback
+            element.classList.add('ring-4', 'ring-yellow-400', 'animate__animated', 'animate__jello');
+            const statusIcon = element.querySelector('.audio-status');
+            const originalIcon = statusIcon.innerHTML;
+            statusIcon.innerHTML = '<div class="loading-spinner"></div>';
+
+            // Exponential Backoff helper
+            const fetchWithRetry = async (url, options, retries = 5, backoff = 1000) => {
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return await response.json();
+                    } catch (err) {
+                        if (i === retries - 1) throw err;
+                        await new Promise(resolve => setTimeout(resolve, backoff));
+                        backoff *= 2;
+                    }
+                }
+            };
+
+            try {
+                const result = await fetchWithRetry(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: item.voice }] }],
+                            generationConfig: {
+                                responseModalities: ["AUDIO"],
+                                speechConfig: {
+                                    voiceConfig: {
+                                        prebuiltVoiceConfig: { voiceName: "Kore" }
+                                    }
+                                }
+                            }
+                        })
+                    }
+                );
+
+                // Safe extraction of audio data
+                const audioData = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                
+                if (audioData) {
+                    await playPCM(audioData);
+                    currentScore += 10;
+                    document.getElementById('score').innerText = currentScore;
+                } else {
+                    throw new Error("No audio data found in response");
+                }
+
+            } catch (error) {
+                console.error("Audio error:", error);
+                // Simple visual error feedback
+                statusIcon.innerHTML = '<span class="text-red-500 text-sm">Gagal memuat suara. Coba lagi.</span>';
+                setTimeout(() => { statusIcon.innerHTML = originalIcon; }, 2000);
+            } finally {
+                isPlaying = false;
+                if (statusIcon.querySelector('.loading-spinner')) {
+                    statusIcon.innerHTML = originalIcon;
+                }
+                setTimeout(() => element.classList.remove('ring-4', 'ring-yellow-400', 'animate__animated', 'animate__jello'), 1000);
+            }
+        }
+
+        function playPCM(base64Data) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const binaryString = window.atob(base64Data);
+                    const len = binaryString.length;
+                    const bytes = new Uint8Array(len);
+                    for (let i = 0; i < len; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    
+                    const sampleRate = 24000;
+                    const wavHeader = new ArrayBuffer(44);
+                    const view = new DataView(wavHeader);
+                    
+                    const writeString = (v, offset, str) => {
+                        for (let i = 0; i < str.length; i++) {
+                            v.setUint8(offset + i, str.charCodeAt(i));
+                        }
+                    };
+
+                    writeString(view, 0, 'RIFF');
+                    view.setUint32(4, 36 + len, true);
+                    writeString(view, 8, 'WAVE');
+                    writeString(view, 12, 'fmt ');
+                    view.setUint32(16, 16, true);
+                    view.setUint16(20, 1, true); 
+                    view.setUint16(22, 1, true); 
+                    view.setUint32(24, sampleRate, true);
+                    view.setUint32(28, sampleRate * 2, true);
+                    view.setUint16(32, 2, true);
+                    view.setUint16(34, 16, true);
+                    writeString(view, 36, 'data');
+                    view.setUint32(40, len, true);
+
+                    const blob = new Blob([wavHeader, bytes], { type: 'audio/wav' });
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    audio.onended = () => {
+                        URL.revokeObjectURL(url);
+                        resolve();
+                    };
+                    audio.onerror = (e) => reject(e);
+                    audio.play();
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
